@@ -61,4 +61,4 @@ services:
     container_name: simpledocker.php-cli
     image: php:${PHP_VERSION}-cli
     volumes:
-      - ./src:/var/www/html
+      - ./project/src:/var/www/html

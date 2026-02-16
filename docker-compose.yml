@@ -1,0 +1,58 @@
+services:
+  web: 
+    image: nginx:${NGINX_VERSION}
+    ports:
+      - "${NGINX_PORT}:80" 
+    volumes:
+      - ./conf/nginx:/etc/nginx/conf.d 
+    restart: unless-stopped
+    depends_on:
+      - php
+
+  db:
+    image: mysql:${MYSQL_VERSION}
+    environment:
+      MYSQL_DATABASE: '${MYSQL_DATABASE}'
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+    ports:
+      - "${MYSQL_PORT}:3306"
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./data/mysql/conf.d:/etc/mysql/conf.d:ro
+      - ./data/mysql/tmp:/var/tmp
+      - ./data/mysql/volumes:/var/lib/mysql
+    restart: unless-stopped
+    depends_on:
+      - php
+  
+  memcached:
+    image: memcached:${MEMCACHED_VERSION}
+    tty: true
+    volumes:
+      - ./data/memcached/log:/var/log/ # memcached.log
+    restart: unless-stopped
+    depends_on:
+      - php
+
+  rabbit:
+    image: rabbitmq:${RABBITMQ_VERSION}
+    environment:
+      RABBITMQ_DEFAULT_USER: 'root'
+      RABBITMQ_DEFAULT_PASS: '${RABBITMQ_DEFAULT_PASS}'
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
+    depends_on:
+      - php
+
+  php:
+    image: php:${PHP_VERSION}-fpm
+    volumes:
+      - ./src:/var/www/html
+    restart: unless-stopped
+  
+  php-cli:
+    image: php:${PHP_VERSION}-cli
+    volumes:
+      - ./src:/var/www/html

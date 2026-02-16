@@ -54,7 +54,7 @@ services:
     container_name: simpledocker.php
     image: php:${PHP_VERSION}-fpm
     volumes:
-      - ./src:/var/www/html
+      - ./project/src:/var/www/html
     restart: unless-stopped
   
   simpledocker.php-cli:
